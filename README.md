@@ -1,7 +1,7 @@
 # RemoteShark
 Quick script to connect Wireshark on Windows to a remote tcpdump instance through named pipes.
-This simple tool is meant to be used to display a packet dump running on a remote linux server with Wireshark on your Windows client.
-It connects to the SSH daemon using putty's utility "plink" and outputs the packet capture to an ad hoc created named pipe on the local Windows PC. Wireshark is then opened to capture the named pipe as interface.
+This simple tool is meant to be used to display a packet capture running on a remote Linux server with Wireshark on your Windows client.
+It connects to the SSH daemon using putty's utility "plink" and outputs the packet capture to an ad hoc created named pipe on the local Windows PC. Wireshark is automatically opened to capture the named pipe as interface.
 
 ## Requirements
 On the client
@@ -26,7 +26,12 @@ Following options are supported:
 ## Future development
 - Try to make the delay smaller
 - Handle sudo password prompt
-- Polish code
+- Python3 testing
+- Translation for Powershell to make it more universal
+- Introduce exception handling
+- Option for thsark
+- Arpspoofing module? Why not..
+...
 
 ## Sources and thanks
 Wireshark documentation provided a very useful starting point for this script.
