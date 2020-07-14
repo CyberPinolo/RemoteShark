@@ -27,19 +27,21 @@ print("""
 |_______/    |__|  |__| /__/     \__\ | _| `._____||__|\__\       
                                                                   """)
 
-
 #parse arguments to receive password and/or a putty profile
-parser = argparse.ArgumentParser(description="Connect wireshark to remote tcpdump!")
-parser.add_argument('-l','--loadprofile',dest='profile',help='Putty profile name')
+parser = argparse.ArgumentParser(description="Connect wireshark to remote tcpdump!\nMake sure you are using root on the remote machine")
+parser.add_argument('-l','--load-profile',dest='profile',help='Putty profile name')
 parser.add_argument('-p','--ask-password',action='store_true',help='Prompt for password')
-parser.add_argument('-f','--custom-filter',help='Custom BPF filter for tcpdump')
+parser.add_argument('-f','--custom-filter',help='Custom BPF filter for tcpdump. Default: "not port 22"')
+parser.add_argument('-i','--custom-interface',help='Default interface is eth0, use -i to specify otherwise"')
 
 
 args = parser.parse_args()
-#print args
+#print(args)
+#exit()
 profile = args.profile
 ask_password = args.ask_password
 custom_filter = args.custom_filter
+custom_interface = args.custom_interface
 
 ssh_password = False
 plink_command = ["plink",'-batch']
@@ -53,16 +55,20 @@ if profile:
 	plink_command.append("-load")
 	plink_command.append(profile)
 
+if not custom_interface:
+    custom_interface = "eth0"
 	
 if custom_filter:
-	plink_command.append("tcpdump -i -eth0 -w - '" + custom_filter + "'")
+	plink_command.append("sudo tcpdump -i " + custom_interface + " -w - '" + custom_filter + "'")
 else:
-	plink_command.append("tcpdump -i eth0 -w - 'not port 22'")
+	plink_command.append("sudo tcpdump -i " + custom_interface + " -w - 'not port 22'")
 
+#print(plink_command)	
 #tell the user how to exit
-print "[+] Press Ctrl+C to exit."
+print("[+] Press Ctrl+C to exit.")
 
 #open Wireshark, configure pipe interface and start capture (not mandatory, you can also do this manually)
+print("[+] Starting Wireshark...")
 wireshark_cmd=['C:\Program Files\Wireshark\Wireshark.exe', r'-i\\.\pipe\wireshark','-k']
 proc=subprocess.Popen(wireshark_cmd)
 
@@ -81,7 +87,7 @@ win32pipe.ConnectNamedPipe(pipe, None)
 
 #register how close the pipe before leaving!																  
 def quit_gracefully():
-	print "Exiting..."
+	print("Exiting...")
 	win32file.CloseHandle(pipe)
 
 atexit.register(quit_gracefully)
